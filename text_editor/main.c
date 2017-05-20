@@ -1,25 +1,10 @@
-#include <stdlib.h>
-#include <termios.h>
 #include <unistd.h>
 
-struct termios orig_termios;
-
-void disableRawMode() {
-    // TCSAFLUSH discards any unread input before applying changes to terminal
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-}
-
-void enableRawMode() {
-    tcgetattr(STDIN_FILENO, &orig_termios);
-    atexit(disableRawMode);
-    struct termios raw = orig_termios;
-    raw.c_lflag &= ~(ECHO);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-}
-
 int main() {
-    enableRawMode();
     char c;
+    // `read` will read in 1 byte from stdin into `c` until nothing left to read
+    // `read` returns the number of bytes that it read, returns 0 when nothing left
+    // options exit by typing 'q'
     while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
     return 0;
 }
